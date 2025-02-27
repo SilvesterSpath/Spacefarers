@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import config from '../config';
 import { useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -19,7 +20,7 @@ import {
   Typography,
 } from '@mui/material';
 
-const API_URL = 'http://localhost:4004/spacefarers';
+const API_URL = config.apiUrl || 'http://localhost:4004/spacefarers';
 
 export default function App() {
   const queryClient = useQueryClient();

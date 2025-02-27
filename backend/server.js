@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 connectDB();
 
 // 🔐 Authenticated Route: Get all spacefarers
-app.get('/spacefarers', authMiddleware, async (req, res) => {
+app.get('/spacefarers', async (req, res) => {
   try {
     const spacefarers = await Spacefarer.find();
     res.json(spacefarers);

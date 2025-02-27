@@ -2,7 +2,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App from './App';
-import SpacefarerDetail from './SpacefarerDetail';
+import SpacefarerDetail from './screens/SpacefarerDetail';
 
 const queryClient = new QueryClient();
 
