@@ -10,6 +10,7 @@ import LogoutButton from './components/LogoutButton';
 import SpacefarersTable from './components/SpacefarersTable';
 import PromotionDialog from './components/PromotionDialog';
 import { usePromote } from './hooks/usePromote';
+import toast from 'react-hot-toast';
 
 const API_URL = config.apiUrl || 'http://localhost:4004/spacefarers';
 
@@ -31,7 +32,7 @@ export default function App() {
   // ✅ Prevent Unauthorized Users from Viewing Spacefarers
   const handleRowClick = (id) => {
     if (!token) {
-      alert('🔒 You must be logged in to view this spacefarer.');
+      toast.error('🔒 You must be logged in to view this spacefarer.');
       return;
     }
     navigate(`/spacefarer/${id}`);
@@ -40,7 +41,7 @@ export default function App() {
   // ✅ Handle Promotion
   const handlePromotion = (id) => {
     if (!token) {
-      alert('🔒 You must be logged in to promote a spacefarer.');
+      toast.error('🔒 You must be logged in to promote a spacefarer.');
       return;
     }
     promoteMutation.mutate(id);

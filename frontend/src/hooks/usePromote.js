@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import config from '../../config';
+import { toast } from 'react-hot-toast';
 
 const API_URL = config.apiUrl || 'http://localhost:4004/spacefarers';
 
@@ -13,7 +14,7 @@ export function usePromote(setPromotionData, setOpen) {
   return useMutation({
     mutationFn: async (id) => {
       if (!token) {
-        alert('🔒 You must be logged in to promote a spacefarer.');
+        toast.error('🔒 You must be logged in to promote a spacefarer.');
         return;
       }
 
