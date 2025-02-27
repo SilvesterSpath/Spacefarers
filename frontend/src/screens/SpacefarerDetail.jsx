@@ -21,7 +21,10 @@ export default function SpacefarerDetail() {
   } = useQuery({
     queryKey: ['spacefarer', id],
     queryFn: async () => {
-      const res = await axios.get(`${API_URL}/${id}`);
+      const token = localStorage.getItem('token');
+      const res = await axios.get(`${API_URL}/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }, // ✅ Sends token in API request
+      });
       return res.data;
     },
   });
