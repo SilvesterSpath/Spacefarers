@@ -76,6 +76,17 @@ app.delete('/spacefarers/:id', authMiddleware, async (req, res) => {
   }
 });
 
+// 🔐 Authenticated Route: Create a new spacefarer
+app.post('/spacefarers', authMiddleware, async (req, res) => {
+  try {
+    const spacefarer = new Spacefarer(req.body);
+    await spacefarer.save();
+    res.status(201).json(spacefarer);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 // 🔐 Generate Token (Login Simulation)
 app.post('/login', (req, res) => {
   const user = { id: '1', username: 'admin' };

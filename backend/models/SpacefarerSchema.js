@@ -8,7 +8,17 @@ const SpacefarerSchema = new mongoose.Schema({
   spacesuitColor: { type: String, required: true },
   department: {
     type: String,
-    enum: ['Exploration', 'Science', 'Engineering', 'Security'],
+    enum: [
+      'Exploration',
+      'Science',
+      'Engineering',
+      'Security',
+      'Medical',
+      'Command',
+      'Mining',
+      'Diplomacy',
+      'Logistics',
+    ],
     required: true,
   },
   position: { type: String, default: 'Cadet' },
