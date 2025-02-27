@@ -1,30 +1,30 @@
-import { useState } from 'react';
+import { useContext } from 'react';
 import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
+import { Button } from '@mui/material';
 
-const LoginButton = () => {
-  const [token, setToken] = useState(localStorage.getItem('token') || '');
+export default function LoginButton() {
+  const { token, login } = useContext(AuthContext);
 
   const handleLogin = async () => {
     try {
       const res = await axios.post('http://localhost:4004/login');
-      localStorage.setItem('token', res.data.token);
-      setToken(res.data.token);
-      alert('Logged in successfully! Please refresh.');
+      login(res.data.token);
+      alert('✅ Logged in successfully!');
     } catch (error) {
       console.error('Login failed:', error);
-      alert('Login failed!');
+      alert('❌ Login failed!');
     }
   };
 
-  return (
-    <div>
-      {token ? (
-        <p>✅ Logged In</p>
-      ) : (
-        <button onClick={handleLogin}>Login</button>
-      )}
-    </div>
-  );
-};
-
-export default LoginButton;
+  return !token ? (
+    <Button
+      variant='contained'
+      color='primary'
+      onClick={handleLogin}
+      style={{ marginRight: '10px' }} // ✅ Adds spacing
+    >
+      🔑 Login
+    </Button>
+  ) : null;
+}

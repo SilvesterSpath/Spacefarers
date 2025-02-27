@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import config from '../config';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from './context/AuthContext'; // ✅ Import AuthContext
 import {
   Container,
   Table,
@@ -25,8 +26,10 @@ import LogoutButton from './components/LogoutButton';
 const API_URL = config.apiUrl || 'http://localhost:4004/spacefarers';
 
 export default function App() {
+  const { token } = useContext(AuthContext); // ✅ Use authentication context
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+
   const { data: spacefarers, isLoading } = useQuery({
     queryKey: ['spacefarers'],
     queryFn: async () => {
@@ -38,10 +41,22 @@ export default function App() {
   const [open, setOpen] = useState(false);
   const [promotionData, setPromotionData] = useState(null);
 
-  // Promote a Spacefarer
+  // ✅ Prevent Unauthorized Users from Viewing Spacefarers
+  const handleRowClick = (id) => {
+    if (!token) {
+      alert('🔒 You must be logged in to view this spacefarer.');
+      return;
+    }
+    navigate(`/spacefarer/${id}`);
+  };
+
+  // ✅ Promote a Spacefarer (Only if Authenticated)
   const promoteMutation = useMutation({
     mutationFn: async (id) => {
-      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('🔒 You must be logged in to promote a spacefarer.');
+        return;
+      }
 
       const res = await axios.post(
         `${API_URL}/${id}/promote`,
@@ -61,8 +76,6 @@ export default function App() {
   });
 
   const handlePromotion = (id) => {
-    const token = localStorage.getItem('token');
-
     if (!token) {
       alert('🔒 You must be logged in to promote a spacefarer.');
       return;
@@ -75,8 +88,10 @@ export default function App() {
   return (
     <Container>
       <h1>🚀 Galactic Spacefarers</h1>
-      <LoginButton />
-      <LogoutButton />
+      <div style={{ marginBottom: '15px' }}>
+        <LoginButton />
+        <LogoutButton />
+      </div>
 
       {/* Spacefarer Table */}
       <TableContainer component={Paper}>
@@ -95,8 +110,8 @@ export default function App() {
             {spacefarers.map((s) => (
               <TableRow
                 key={s._id}
-                onClick={() => navigate(`/spacefarer/${s._id}`)} // ✅ Navigate to detail page
-                style={{ cursor: 'pointer' }} // Make rows clickable
+                onClick={() => handleRowClick(s._id)} // ✅ Now checks auth before navigating
+                style={{ cursor: 'pointer' }}
               >
                 <TableCell>{s.name}</TableCell>
                 <TableCell>{s.originPlanet}</TableCell>
