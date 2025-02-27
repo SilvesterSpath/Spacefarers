@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import {
   Container,
   Table,
@@ -10,15 +10,20 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
   Button,
   Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Typography,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 
 const API_URL = 'http://localhost:4004/spacefarers';
 
 export default function App() {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { data: spacefarers, isLoading } = useQuery({
     queryKey: ['spacefarers'],
     queryFn: async () => {
@@ -27,41 +32,33 @@ export default function App() {
     },
   });
 
-  const [originFilter, setOriginFilter] = useState('');
-  const [colorFilter, setColorFilter] = useState('');
-  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const [promotionData, setPromotionData] = useState(null);
+
+  // Promote a Spacefarer
+  const promoteMutation = useMutation({
+    mutationFn: async (id) => {
+      const res = await axios.post(`${API_URL}/${id}/promote`);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      setPromotionData(data);
+      setOpen(true);
+      queryClient.invalidateQueries(['spacefarers']); // Refresh data
+    },
+  });
+
+  const handlePromotion = (id) => {
+    promoteMutation.mutate(id);
+  };
 
   if (isLoading) return <p>Loading spacefarers...</p>;
-
-  const filteredSpacefarers = spacefarers.filter(
-    (s) =>
-      s.originPlanet.includes(originFilter) &&
-      s.spacesuitColor.includes(colorFilter)
-  );
 
   return (
     <Container>
       <h1>🚀 Galactic Spacefarers</h1>
 
-      {/* Filters */}
-      <TextField
-        label='Origin Planet'
-        value={originFilter}
-        onChange={(e) => setOriginFilter(e.target.value)}
-      />
-      <TextField
-        label='Spacesuit Color'
-        value={colorFilter}
-        onChange={(e) => setColorFilter(e.target.value)}
-      />
-      <Button
-        variant='contained'
-        onClick={() => setOriginFilter('') & setColorFilter('')}
-      >
-        Reset Filters
-      </Button>
-
-      {/* Spacefarers Table */}
+      {/* Spacefarer Table */}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -70,29 +67,29 @@ export default function App() {
               <TableCell>Origin</TableCell>
               <TableCell>Color</TableCell>
               <TableCell>Wormhole Skill</TableCell>
+              <TableCell>Position</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredSpacefarers.map((s) => (
+            {spacefarers.map((s) => (
               <TableRow
                 key={s._id}
-                onClick={() => navigate(`/spacefarer/${s._id}`)}
-                style={{ cursor: 'pointer' }}
+                onClick={() => navigate(`/spacefarer/${s._id}`)} // ✅ Navigate to detail page
+                style={{ cursor: 'pointer' }} // Make rows clickable
               >
                 <TableCell>{s.name}</TableCell>
                 <TableCell>{s.originPlanet}</TableCell>
                 <TableCell>{s.spacesuitColor}</TableCell>
                 <TableCell>{s.wormholeSkill}</TableCell>
+                <TableCell>{s.position}</TableCell>
                 <TableCell>
                   <Button
                     variant='contained'
                     color='primary'
                     onClick={(e) => {
                       e.stopPropagation();
-                      axios
-                        .post(`${API_URL}/${s._id}/promote`)
-                        .then(() => window.location.reload());
+                      handlePromotion(s._id);
                     }}
                   >
                     Promote
@@ -103,6 +100,30 @@ export default function App() {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* Promotion Popup Dialog */}
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogTitle>🎖 Promotion Success!</DialogTitle>
+        <DialogContent>
+          {promotionData && (
+            <>
+              <Typography variant='h6'>{promotionData.message}</Typography>
+              <Typography>
+                🚀 **New Wormhole Skill**:{' '}
+                {promotionData.spacefarer.wormholeSkill}
+              </Typography>
+              <Typography>
+                🎖 **New Rank**: {promotionData.spacefarer.position}
+              </Typography>
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)} color='primary'>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }

@@ -50,7 +50,7 @@ app.get('/spacefarers/:id', async (req, res) => {
 app.post('/spacefarers/:id/promote', async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(`Promoting Spacefarer with ID: ${id}`); // Debugging
+    console.log(`Promoting Spacefarer with ID: ${id}`);
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ error: 'Invalid ID format' });
@@ -61,18 +61,29 @@ app.post('/spacefarers/:id/promote', async (req, res) => {
       return res.status(404).json({ error: 'Spacefarer not found' });
     }
 
-    // Increase wormhole skill and update position (example logic)
+    // Store old skill and rank for reference
+    const oldSkill = spacefarer.wormholeSkill;
+    const oldRank = spacefarer.position;
+
+    // Increase skill and promote rank
     spacefarer.wormholeSkill += 10;
 
-    // Example: Promote based on skill level
     if (spacefarer.wormholeSkill >= 100) {
       spacefarer.position = 'Interstellar Captain';
+    } else if (spacefarer.wormholeSkill >= 80) {
+      spacefarer.position = 'Elite Navigator';
+    } else if (spacefarer.wormholeSkill >= 50) {
+      spacefarer.position = 'Galactic Officer';
     }
 
     await spacefarer.save();
 
     res.json({
       message: `${spacefarer.name} has been promoted!`,
+      oldSkill,
+      newSkill: spacefarer.wormholeSkill,
+      oldRank,
+      newRank: spacefarer.position,
       spacefarer,
     });
   } catch (error) {
