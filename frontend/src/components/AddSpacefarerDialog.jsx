@@ -38,7 +38,7 @@ export default function AddSpacefarerDialog({ open, setOpen }) {
       return res.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['spacefarers']); // ✅ Refresh spacefarers list
+      queryClient.invalidateQueries(['spacefarers']); //  Refresh spacefarers list
       setOpen(false);
     },
   });

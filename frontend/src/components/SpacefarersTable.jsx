@@ -60,7 +60,7 @@ export default function SpacefarersTable({
   );
 }
 
-// ✅ Add PropTypes to prevent ESLint warnings
+//  Add PropTypes to prevent ESLint warnings
 SpacefarersTable.propTypes = {
   spacefarers: PropTypes.arrayOf(
     PropTypes.shape({

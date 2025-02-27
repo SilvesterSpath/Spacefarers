@@ -37,7 +37,7 @@ export default function PromotionDialog({ open, setOpen, promotionData }) {
   );
 }
 
-// ✅ Add PropTypes to prevent ESLint warnings
+//  Add PropTypes to prevent ESLint warnings
 PromotionDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   setOpen: PropTypes.func.isRequired,

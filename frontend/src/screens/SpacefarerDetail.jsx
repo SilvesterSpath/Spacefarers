@@ -23,7 +23,7 @@ export default function SpacefarerDetail() {
     queryFn: async () => {
       const token = localStorage.getItem('token');
       const res = await axios.get(`${API_URL}/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }, // ✅ Sends token in API request
+        headers: { Authorization: `Bearer ${token}` }, //  Sends token in API request
       });
       return res.data;
     },

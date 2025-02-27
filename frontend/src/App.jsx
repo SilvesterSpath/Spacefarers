@@ -3,13 +3,14 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import config from '../config';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from './context/AuthContext'; // ✅ Use authentication context
+import { AuthContext } from './context/AuthContext';
 import {
   Container,
   MenuItem,
   Select,
   FormControl,
   InputLabel,
+  Button,
 } from '@mui/material';
 import LoginButton from './components/LoginButton';
 import LogoutButton from './components/LogoutButton';
@@ -17,10 +18,13 @@ import SpacefarersTable from './components/SpacefarersTable';
 import PromotionDialog from './components/PromotionDialog';
 import { usePromote } from './hooks/usePromote';
 import { toast } from 'react-hot-toast';
+import AddSpacefarerDialog from './components/AddSpacefarerDialog';
 
 const API_URL = config.apiUrl || 'http://localhost:4004/spacefarers';
 
 export default function App() {
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
   const { data: spacefarers, isLoading } = useQuery({
@@ -35,11 +39,11 @@ export default function App() {
   const [promotionData, setPromotionData] = useState(null);
   const promoteMutation = usePromote(setPromotionData, setOpen);
 
-  // ✅ State for Filters
+  //  State for Filters
   const [selectedPlanet, setSelectedPlanet] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
 
-  // ✅ Handle Row Click (Prevent Unauthorized Access)
+  //  Handle Row Click (Prevent Unauthorized Access)
   const handleRowClick = (id) => {
     if (!token) {
       toast.error('🔒 You must be logged in to view this spacefarer.');
@@ -48,7 +52,7 @@ export default function App() {
     navigate(`/spacefarer/${id}`);
   };
 
-  // ✅ Handle Promotion
+  //  Handle Promotion
   const handlePromotion = (id) => {
     if (!token) {
       toast.error('🔒 You must be logged in to promote a spacefarer.');
@@ -59,7 +63,7 @@ export default function App() {
 
   if (isLoading) return <p>Loading spacefarers...</p>;
 
-  // ✅ Filtered Spacefarers List
+  //  Filtered Spacefarers List
   const filteredSpacefarers = spacefarers.filter((s) => {
     return (
       (selectedPlanet === '' || s.originPlanet === selectedPlanet) &&
@@ -67,7 +71,7 @@ export default function App() {
     );
   });
 
-  // ✅ Extract Unique Values for Dropdowns
+  //  Extract Unique Values for Dropdowns
   const uniquePlanets = [...new Set(spacefarers.map((s) => s.originPlanet))];
   const uniqueColors = [...new Set(spacefarers.map((s) => s.spacesuitColor))];
 
@@ -77,9 +81,17 @@ export default function App() {
       <div style={{ marginBottom: '15px' }}>
         <LoginButton />
         <LogoutButton />
+        <Button
+          variant='contained'
+          color='success'
+          onClick={() => setAddDialogOpen(true)}
+        >
+          ➕ Add Spacefarer
+        </Button>
       </div>
+      <AddSpacefarerDialog open={addDialogOpen} setOpen={setAddDialogOpen} />
 
-      {/* ✅ Filter Controls */}
+      {/*  Filter Controls */}
       <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
         {/* Origin Planet Filter */}
         <FormControl variant='outlined' style={{ minWidth: 200 }}>

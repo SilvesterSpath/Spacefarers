@@ -11,7 +11,7 @@ export default function LoginButton() {
     try {
       const res = await axios.post('http://localhost:4004/login');
       login(res.data.token);
-      toast.success('✅ Logged in successfully!');
+      toast.success(' Logged in successfully!');
     } catch (error) {
       console.error('Login failed:', error);
       toast.error('❌ Login failed!');
@@ -23,7 +23,7 @@ export default function LoginButton() {
       variant='contained'
       color='primary'
       onClick={handleLogin}
-      style={{ marginRight: '10px' }} // ✅ Adds spacing
+      style={{ marginRight: '10px' }} //  Adds spacing
     >
       🔑 Login
     </Button>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { AuthContext } from './AuthContext'; // ✅ Import the separated context
+import { AuthContext } from './AuthContext'; //  Import the separated context
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(localStorage.getItem('token'));

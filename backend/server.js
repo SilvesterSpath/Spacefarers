@@ -4,7 +4,7 @@ const cors = require('cors');
 const connectDB = require('./api/db');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const authMiddleware = require('./middleware/auth'); // ✅ Import auth middleware
+const authMiddleware = require('./middleware/auth'); //  Import auth middleware
 const Spacefarer = require('./models/SpacefarerSchema');
 const jwt = require('jsonwebtoken');
 
