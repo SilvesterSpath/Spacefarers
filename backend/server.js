@@ -2,7 +2,7 @@ const express = require('express');
 const connectDB = require('./api/db');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const Spacefarer = require('../models/SpacefarerSchema');
+const Spacefarer = require('./models/SpacefarerSchema');
 
 const app = express();
 
