@@ -20,6 +20,7 @@ import {
   Typography,
 } from '@mui/material';
 import LoginButton from './components/LoginButton';
+import LogoutButton from './components/LogoutButton';
 
 const API_URL = config.apiUrl || 'http://localhost:4004/spacefarers';
 
@@ -42,16 +43,11 @@ export default function App() {
     mutationFn: async (id) => {
       const token = localStorage.getItem('token');
 
-      if (!token) {
-        alert('🔒 You must be logged in to promote a spacefarer.');
-        return;
-      }
-
       const res = await axios.post(
-        `${API_URL}/${id}/promote`, // ✅ Correct URL
-        {}, // ✅ Empty request body (required for POST)
+        `${API_URL}/${id}/promote`,
+        {},
         {
-          headers: { Authorization: `Bearer ${token}` }, // ✅ Correctly placed headers
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
@@ -65,6 +61,12 @@ export default function App() {
   });
 
   const handlePromotion = (id) => {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      alert('🔒 You must be logged in to promote a spacefarer.');
+      return;
+    }
     promoteMutation.mutate(id);
   };
 
@@ -74,6 +76,7 @@ export default function App() {
     <Container>
       <h1>🚀 Galactic Spacefarers</h1>
       <LoginButton />
+      <LogoutButton />
 
       {/* Spacefarer Table */}
       <TableContainer component={Paper}>
