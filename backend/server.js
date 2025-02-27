@@ -1,96 +1,87 @@
+require('dotenv').config();
 const express = require('express');
-const connectDB = require('./api/db');
 const cors = require('cors');
+const connectDB = require('./api/db');
 const bodyParser = require('body-parser');
-const Spacefarer = require('./models/SpacefarerSchema');
 const mongoose = require('mongoose');
+const authMiddleware = require('./middleware/auth'); // ✅ Import auth middleware
+const Spacefarer = require('./models/SpacefarerSchema');
+const jwt = require('jsonwebtoken');
 
 const app = express();
-
-// 🔥 Enable CORS for all requests
 app.use(cors({ origin: '*' }));
-
 app.use(bodyParser.json());
 
-connectDB(); // Connect to MongoDB
+// Connect to MongoDB
+connectDB();
 
-// Get all spacefarers
-app.get('/spacefarers', async (req, res) => {
-  const spacefarers = await Spacefarer.find();
-  res.json(spacefarers);
-});
-
-// Add a new spacefarer
-app.post('/spacefarers', async (req, res) => {
-  const spacefarer = await Spacefarer.create(req.body);
-  res.status(201).json(spacefarer);
-});
-
-app.get('/spacefarers/:id', async (req, res) => {
+// 🔐 Authenticated Route: Get all spacefarers
+app.get('/spacefarers', authMiddleware, async (req, res) => {
   try {
-    const { id } = req.params;
-    console.log('Fetching Spacefarer with ID:', id); // Debugging
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ error: 'Invalid ID format' });
-    }
-
-    const spacefarer = await Spacefarer.findById(id);
-    if (!spacefarer) {
-      return res.status(404).json({ error: 'Spacefarer not found' });
-    }
-
-    res.json(spacefarer);
+    const spacefarers = await Spacefarer.find();
+    res.json(spacefarers);
   } catch (error) {
-    console.error('Error fetching spacefarer:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-app.post('/spacefarers/:id/promote', async (req, res) => {
+// 🔐 Authenticated Route: Get a single spacefarer by ID
+app.get('/spacefarers/:id', authMiddleware, async (req, res) => {
   try {
-    const { id } = req.params;
-    console.log(`Promoting Spacefarer with ID: ${id}`);
+    const spacefarer = await Spacefarer.findById(req.params.id);
+    if (!spacefarer) return res.status(404).json({ error: 'Not found' });
+    res.json(spacefarer);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ error: 'Invalid ID format' });
-    }
+// 🔐 Authenticated Route: Create a new spacefarer
+app.post('/spacefarers', authMiddleware, async (req, res) => {
+  try {
+    const spacefarer = new Spacefarer(req.body);
+    await spacefarer.save();
+    res.status(201).json(spacefarer);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
 
-    const spacefarer = await Spacefarer.findById(id);
-    if (!spacefarer) {
-      return res.status(404).json({ error: 'Spacefarer not found' });
-    }
+// 🔐 Authenticated Route: Promote a spacefarer
+app.post('/spacefarers/:id/promote', authMiddleware, async (req, res) => {
+  try {
+    const spacefarer = await Spacefarer.findById(req.params.id);
+    if (!spacefarer) return res.status(404).json({ error: 'Not found' });
 
-    // Store old skill and rank for reference
-    const oldSkill = spacefarer.wormholeSkill;
-    const oldRank = spacefarer.position;
-
-    // Increase skill and promote rank
     spacefarer.wormholeSkill += 10;
-
     if (spacefarer.wormholeSkill >= 100) {
       spacefarer.position = 'Interstellar Captain';
-    } else if (spacefarer.wormholeSkill >= 80) {
-      spacefarer.position = 'Elite Navigator';
-    } else if (spacefarer.wormholeSkill >= 50) {
-      spacefarer.position = 'Galactic Officer';
     }
 
     await spacefarer.save();
 
-    res.json({
-      message: `${spacefarer.name} has been promoted!`,
-      oldSkill,
-      newSkill: spacefarer.wormholeSkill,
-      oldRank,
-      newRank: spacefarer.position,
-      spacefarer,
-    });
+    res.json({ message: `${spacefarer.name} has been promoted!`, spacefarer });
   } catch (error) {
-    console.error('Error promoting spacefarer:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Start the server
+// 🔐 Authenticated Route: Delete a spacefarer
+app.delete('/spacefarers/:id', authMiddleware, async (req, res) => {
+  try {
+    await Spacefarer.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Spacefarer deleted' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 🔐 Generate Token (Login Simulation)
+app.post('/login', (req, res) => {
+  const user = { id: '1', username: 'admin' };
+  const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '1h' });
+  res.json({ token });
+});
+
+// Start Server
 app.listen(4004, () => console.log('🚀 Server running on port 4004'));
