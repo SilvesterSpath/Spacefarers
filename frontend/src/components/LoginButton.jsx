@@ -1,31 +1,55 @@
-import { useContext } from 'react';
-import axios from 'axios';
+import { useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { Button } from '@mui/material';
-import { toast } from 'react-hot-toast';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+} from '@mui/material';
+import axios from 'axios';
 
 export default function LoginButton() {
-  const { token, login } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
+  const [open, setOpen] = useState(false);
+  const [username, setUsername] = useState('');
 
   const handleLogin = async () => {
     try {
-      const res = await axios.post('http://localhost:4004/login');
+      const res = await axios.post('http://localhost:4004/login', { username });
       login(res.data.token);
-      toast.success(' Logged in successfully!');
+      setOpen(false);
     } catch (error) {
-      console.error('Login failed:', error);
-      toast.error('❌ Login failed!');
+      console.log(error);
+      alert('Login failed!');
     }
   };
 
-  return !token ? (
-    <Button
-      variant='contained'
-      color='primary'
-      onClick={handleLogin}
-      style={{ marginRight: '10px' }} //  Adds spacing
-    >
-      🔑 Login
-    </Button>
-  ) : null;
+  return (
+    <>
+      <Button variant='contained' color='primary' onClick={() => setOpen(true)}>
+        🔑 Login
+      </Button>
+
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogTitle>🔑 Enter Username to Login</DialogTitle>
+        <DialogContent>
+          <TextField
+            label='Username'
+            fullWidth
+            margin='dense'
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)}>Cancel</Button>
+          <Button onClick={handleLogin} color='primary' variant='contained'>
+            Login
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
 }

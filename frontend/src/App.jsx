@@ -24,6 +24,7 @@ const API_URL = config.apiUrl || 'http://localhost:4004/spacefarers';
 
 export default function App() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const { role } = useContext(AuthContext);
 
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -55,7 +56,14 @@ export default function App() {
   //  Handle Promotion
   const handlePromotion = (id) => {
     if (!token) {
-      toast.error('🔒 You must be logged in to promote a spacefarer.');
+      toast.error(
+        '🔒 You must be logged in to promote a spacefarer.',
+        'warning'
+      );
+      return;
+    }
+    if (role !== 'admin') {
+      toast.error('🚫 Only admins can promote spacefarers!', 'error');
       return;
     }
     promoteMutation.mutate(id);
@@ -81,13 +89,15 @@ export default function App() {
       <div style={{ marginBottom: '15px' }}>
         <LoginButton />
         <LogoutButton />
-        <Button
-          variant='contained'
-          color='success'
-          onClick={() => setAddDialogOpen(true)}
-        >
-          ➕ Add Spacefarer
-        </Button>
+        {role === 'admin' && (
+          <Button
+            variant='contained'
+            color='success'
+            onClick={() => setAddDialogOpen(true)}
+          >
+            ➕ Add Spacefarer
+          </Button>
+        )}
       </div>
       <AddSpacefarerDialog open={addDialogOpen} setOpen={setAddDialogOpen} />
 

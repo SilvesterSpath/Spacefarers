@@ -89,8 +89,15 @@ app.post('/spacefarers', authMiddleware, async (req, res) => {
 
 // 🔐 Generate Token (Login Simulation)
 app.post('/login', (req, res) => {
-  const user = { id: '1', username: 'admin' };
+  const { username } = req.body; // Assume login payload has username
+
+  let userRole = 'user'; // Default role
+  if (username === 'admin') userRole = 'admin'; // Give "admin" extra power
+
+  const user = { id: '1', username, role: userRole };
+
   const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '1h' });
+
   res.json({ token });
 });
 
