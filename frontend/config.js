@@ -1,9 +1,5 @@
-// config.js
 const config = {
-  apiUrl:
-    window.location.hostname === 'localhost'
-      ? 'http://localhost:4004/spacefarers'
-      : 'https://spacefarers.onrender.com/spacefarers',
+  apiUrl: import.meta.env.VITE_API_URL || 'http://localhost:4004/spacefarers',
 };
 
 export default config;
