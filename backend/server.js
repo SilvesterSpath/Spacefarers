@@ -87,7 +87,7 @@ app.post('/spacefarers', authMiddleware, async (req, res) => {
 });
 
 // 🔐 Generate Token (Login Simulation)
-app.post('/login', (req, res) => {
+app.post('/spacefarers/login', (req, res) => {
   const { username } = req.body; // Assume login payload has username
 
   let userRole = 'user'; // Default role

@@ -12,6 +12,7 @@ import {
   TextField,
 } from '@mui/material';
 import config from '../../config';
+import { toast } from 'react-hot-toast';
 
 export default function AddSpacefarerDialog({ open, setOpen }) {
   const { token } = useContext(AuthContext);
@@ -50,7 +51,7 @@ export default function AddSpacefarerDialog({ open, setOpen }) {
 
   const handleSubmit = () => {
     if (!token) {
-      alert('🔒 You must be logged in to add a spacefarer.');
+      toast.error('🔒 You must be logged in to add a spacefarer.');
       return;
     }
     mutation.mutate(formData);
