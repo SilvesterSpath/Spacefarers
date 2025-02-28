@@ -43,11 +43,6 @@ npm install
 3️⃣ Set Up Environment Variables
 Create a .env file inside the backend directory:
 
-MONGO_URI=mongodb+srv://your_username:your_password@cluster0.mongodb.net/space
-JWT_SECRET=your_secret_key
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_email_password
-
 🖥 Running the App
 Start the Backend
 
