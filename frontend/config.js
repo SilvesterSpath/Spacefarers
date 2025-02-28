@@ -3,7 +3,7 @@ const config = {
   apiUrl:
     window.location.hostname === 'localhost'
       ? 'http://localhost:4004/spacefarers'
-      : 'https://your-production-api.com/api',
+      : 'https://spacefarers.onrender.com/spacefarers',
 };
 
 export default config;

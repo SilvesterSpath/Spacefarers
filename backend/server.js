@@ -15,7 +15,6 @@ app.use(bodyParser.json());
 // Connect to MongoDB
 connectDB();
 
-// 🔐 Authenticated Route: Get all spacefarers
 app.get('/spacefarers', async (req, res) => {
   try {
     const spacefarers = await Spacefarer.find();
