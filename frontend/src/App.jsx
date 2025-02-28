@@ -19,6 +19,7 @@ import PromotionDialog from './components/PromotionDialog';
 import { usePromote } from './hooks/usePromote';
 import { toast } from 'react-hot-toast';
 import AddSpacefarerDialog from './components/AddSpacefarerDialog';
+import ThemeToggle from './components/ThemeToggle';
 
 const API_URL = config.apiUrl || 'http://localhost:4004/spacefarers';
 
@@ -87,6 +88,7 @@ export default function App() {
     <Container>
       <h1>🚀 Galactic Spacefarers</h1>
       <div style={{ marginBottom: '15px' }}>
+        <ThemeToggle />
         <LoginButton />
         <LogoutButton />
         {role === 'admin' && (
