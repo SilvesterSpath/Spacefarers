@@ -8,8 +8,9 @@ import {
   Typography,
   CircularProgress,
 } from '@mui/material';
+import config from '../../config';
 
-const API_URL = 'http://localhost:4004/spacefarers';
+const API_URL = config.apiUrl;
 
 export default function SpacefarerDetail() {
   const { id } = useParams();

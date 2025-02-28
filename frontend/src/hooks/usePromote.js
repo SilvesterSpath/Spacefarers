@@ -5,7 +5,7 @@ import { AuthContext } from '../context/AuthContext';
 import config from '../../config';
 import { toast } from 'react-hot-toast';
 
-const API_URL = config.apiUrl || 'http://localhost:4004/spacefarers';
+const API_URL = config.apiUrl;
 
 export function usePromote(setPromotionData, setOpen) {
   const { token } = useContext(AuthContext);

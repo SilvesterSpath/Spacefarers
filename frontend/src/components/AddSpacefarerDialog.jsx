@@ -11,6 +11,7 @@ import {
   Button,
   TextField,
 } from '@mui/material';
+import config from '../../config';
 
 export default function AddSpacefarerDialog({ open, setOpen }) {
   const { token } = useContext(AuthContext);
@@ -29,7 +30,7 @@ export default function AddSpacefarerDialog({ open, setOpen }) {
   const mutation = useMutation({
     mutationFn: async (newSpacefarer) => {
       const res = await axios.post(
-        'http://localhost:4004/spacefarers',
+        `${config.apiUrl}/spacefarers`,
         newSpacefarer,
         {
           headers: { Authorization: `Bearer ${token}` },

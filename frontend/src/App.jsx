@@ -14,7 +14,7 @@ import { toast } from 'react-hot-toast';
 import AddSpacefarerDialog from './components/AddSpacefarerDialog';
 import ThemeToggle from './components/ThemeToggle';
 
-const API_URL = config.apiUrl || 'http://localhost:4004/spacefarers';
+const API_URL = config.apiUrl;
 
 export default function App() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);

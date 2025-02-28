@@ -9,6 +9,7 @@ import {
   TextField,
 } from '@mui/material';
 import axios from 'axios';
+import config from '../../config';
 
 export default function LoginButton() {
   const { login } = useContext(AuthContext);
@@ -17,7 +18,7 @@ export default function LoginButton() {
 
   const handleLogin = async () => {
     try {
-      const res = await axios.post('http://localhost:4004/login', { username });
+      const res = await axios.post(`${config.apiUrl}/login`, { username });
       login(res.data.token);
       setOpen(false);
     } catch (error) {
