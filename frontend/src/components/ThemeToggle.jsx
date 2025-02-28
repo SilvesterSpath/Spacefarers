@@ -8,7 +8,7 @@ export default function ThemeToggle() {
   return (
     <FormControlLabel
       control={<Switch checked={themeMode === 'dark'} onChange={toggleTheme} />}
-      label={themeMode === 'dark' ? '🌙 Dark Mode' : '☀️ Light Mode'}
+      label={themeMode === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode'}
     />
   );
 }

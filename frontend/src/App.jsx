@@ -4,14 +4,7 @@ import axios from 'axios';
 import config from '../config';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from './context/AuthContext';
-import {
-  Container,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-  Button,
-} from '@mui/material';
+import { Container, Button, Typography } from '@mui/material';
 import LoginButton from './components/LoginButton';
 import LogoutButton from './components/LogoutButton';
 import SpacefarersTable from './components/SpacefarersTable';
@@ -25,10 +18,9 @@ const API_URL = config.apiUrl || 'http://localhost:4004/spacefarers';
 
 export default function App() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const { role } = useContext(AuthContext);
-
-  const { token } = useContext(AuthContext);
+  const { role, token } = useContext(AuthContext);
   const navigate = useNavigate();
+
   const { data: spacefarers, isLoading } = useQuery({
     queryKey: ['spacefarers'],
     queryFn: async () => {
@@ -41,11 +33,11 @@ export default function App() {
   const [promotionData, setPromotionData] = useState(null);
   const promoteMutation = usePromote(setPromotionData, setOpen);
 
-  //  State for Filters
-  const [selectedPlanet, setSelectedPlanet] = useState('');
-  const [selectedColor, setSelectedColor] = useState('');
+  // ✅ Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5; // ✅ Number of spacefarers per page
 
-  //  Handle Row Click (Prevent Unauthorized Access)
+  // ✅ Handle Row Click (Prevent Unauthorized Access)
   const handleRowClick = (id) => {
     if (!token) {
       toast.error('🔒 You must be logged in to view this spacefarer.');
@@ -54,17 +46,14 @@ export default function App() {
     navigate(`/spacefarer/${id}`);
   };
 
-  //  Handle Promotion
+  // ✅ Handle Promotion
   const handlePromotion = (id) => {
     if (!token) {
-      toast.error(
-        '🔒 You must be logged in to promote a spacefarer.',
-        'warning'
-      );
+      toast.error('🔒 You must be logged in to promote a spacefarer.');
       return;
     }
     if (role !== 'admin') {
-      toast.error('🚫 Only admins can promote spacefarers!', 'error');
+      toast.error('🚫 Only admins can promote spacefarers!');
       return;
     }
     promoteMutation.mutate(id);
@@ -72,17 +61,21 @@ export default function App() {
 
   if (isLoading) return <p>Loading spacefarers...</p>;
 
-  //  Filtered Spacefarers List
-  const filteredSpacefarers = spacefarers.filter((s) => {
-    return (
-      (selectedPlanet === '' || s.originPlanet === selectedPlanet) &&
-      (selectedColor === '' || s.spacesuitColor === selectedColor)
-    );
-  });
+  // ✅ Paginate Spacefarers
+  const totalPages = Math.ceil(spacefarers.length / pageSize);
+  const paginatedSpacefarers = spacefarers.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
-  //  Extract Unique Values for Dropdowns
-  const uniquePlanets = [...new Set(spacefarers.map((s) => s.originPlanet))];
-  const uniqueColors = [...new Set(spacefarers.map((s) => s.spacesuitColor))];
+  // ✅ Pagination Handlers
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+  };
 
   return (
     <Container>
@@ -103,48 +96,40 @@ export default function App() {
       </div>
       <AddSpacefarerDialog open={addDialogOpen} setOpen={setAddDialogOpen} />
 
-      {/*  Filter Controls */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-        {/* Origin Planet Filter */}
-        <FormControl variant='outlined' style={{ minWidth: 200 }}>
-          <InputLabel>🌍 Origin Planet</InputLabel>
-          <Select
-            value={selectedPlanet}
-            onChange={(e) => setSelectedPlanet(e.target.value)}
-            label='Origin Planet'
-          >
-            <MenuItem value=''>All</MenuItem>
-            {uniquePlanets.map((planet) => (
-              <MenuItem key={planet} value={planet}>
-                {planet}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        {/* Spacesuit Color Filter */}
-        <FormControl variant='outlined' style={{ minWidth: 200 }}>
-          <InputLabel>🎨 Spacesuit Color</InputLabel>
-          <Select
-            value={selectedColor}
-            onChange={(e) => setSelectedColor(e.target.value)}
-            label='Spacesuit Color'
-          >
-            <MenuItem value=''>All</MenuItem>
-            {uniqueColors.map((color) => (
-              <MenuItem key={color} value={color}>
-                {color}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </div>
-
+      {/* ✅ Spacefarers Table */}
       <SpacefarersTable
-        spacefarers={filteredSpacefarers}
+        spacefarers={paginatedSpacefarers}
         handleRowClick={handleRowClick}
         handlePromotion={handlePromotion}
       />
+
+      {/* ✅ Pagination Controls */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '10px',
+          marginTop: '15px',
+        }}
+      >
+        <Button
+          variant='outlined'
+          onClick={handlePrevPage}
+          disabled={currentPage === 1}
+        >
+          ⬅ Previous
+        </Button>
+        <Typography variant='body1'>
+          Page {currentPage} of {totalPages}
+        </Typography>
+        <Button
+          variant='outlined'
+          onClick={handleNextPage}
+          disabled={currentPage === totalPages}
+        >
+          Next ➡
+        </Button>
+      </div>
 
       <PromotionDialog
         open={open}
