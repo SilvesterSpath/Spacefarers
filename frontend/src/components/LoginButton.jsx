@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import config from '../../config';
+import { toast } from 'react-hot-toast';
 
 export default function LoginButton() {
   const { login } = useContext(AuthContext);
@@ -23,7 +24,7 @@ export default function LoginButton() {
       setOpen(false);
     } catch (error) {
       console.log(error);
-      alert('Login failed!');
+      toast.error('Login failed!');
     }
   };
 

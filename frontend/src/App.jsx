@@ -4,7 +4,15 @@ import axios from 'axios';
 import config from '../config';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from './context/AuthContext';
-import { Container, Button, Typography } from '@mui/material';
+import {
+  Container,
+  Button,
+  Typography,
+  TextField,
+  InputAdornment,
+} from '@mui/material';
+import PublicIcon from '@mui/icons-material/Public';
+import PaletteIcon from '@mui/icons-material/Palette';
 import LoginButton from './components/LoginButton';
 import LogoutButton from './components/LogoutButton';
 import SpacefarersTable from './components/SpacefarersTable';
@@ -33,11 +41,15 @@ export default function App() {
   const [promotionData, setPromotionData] = useState(null);
   const promoteMutation = usePromote(setPromotionData, setOpen);
 
-  // ✅ Pagination State
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 5; // ✅ Number of spacefarers per page
+  //  Filtering State
+  const [searchOrigin, setSearchOrigin] = useState('');
+  const [searchColor, setSearchColor] = useState('');
 
-  // ✅ Handle Row Click (Prevent Unauthorized Access)
+  //  Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5; //  Number of spacefarers per page
+
+  //  Handle Row Click (Prevent Unauthorized Access)
   const handleRowClick = (id) => {
     if (!token) {
       toast.error('🔒 You must be logged in to view this spacefarer.');
@@ -46,7 +58,7 @@ export default function App() {
     navigate(`/spacefarer/${id}`);
   };
 
-  // ✅ Handle Promotion
+  //  Handle Promotion
   const handlePromotion = (id) => {
     if (!token) {
       toast.error('🔒 You must be logged in to promote a spacefarer.');
@@ -61,14 +73,24 @@ export default function App() {
 
   if (isLoading) return <p>Loading spacefarers...</p>;
 
-  // ✅ Paginate Spacefarers
-  const totalPages = Math.ceil(spacefarers.length / pageSize);
-  const paginatedSpacefarers = spacefarers.slice(
+  //  Apply Filters Before Pagination
+  const filteredSpacefarers = spacefarers.filter((s) => {
+    return (
+      (searchOrigin === '' ||
+        s.originPlanet.toLowerCase().includes(searchOrigin.toLowerCase())) &&
+      (searchColor === '' ||
+        s.spacesuitColor.toLowerCase().includes(searchColor.toLowerCase()))
+    );
+  });
+
+  //  Paginate AFTER filtering
+  const totalPages = Math.ceil(filteredSpacefarers.length / pageSize);
+  const paginatedSpacefarers = filteredSpacefarers.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
 
-  // ✅ Pagination Handlers
+  //  Pagination Handlers
   const handleNextPage = () => {
     if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
   };
@@ -96,14 +118,49 @@ export default function App() {
       </div>
       <AddSpacefarerDialog open={addDialogOpen} setOpen={setAddDialogOpen} />
 
-      {/* ✅ Spacefarers Table */}
+      {/* Filter Controls */}
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+        {/* Origin Planet Filter */}
+        <TextField
+          label='Search Origin Planet'
+          variant='outlined'
+          value={searchOrigin}
+          onChange={(e) => setSearchOrigin(e.target.value)}
+          fullWidth
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position='start'>
+                <PublicIcon color='primary' />
+              </InputAdornment>
+            ),
+          }}
+        />
+
+        {/* Spacesuit Color Filter */}
+        <TextField
+          label='Search Spacesuit Color'
+          variant='outlined'
+          value={searchColor}
+          onChange={(e) => setSearchColor(e.target.value)}
+          fullWidth
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position='start'>
+                <PaletteIcon color='primary' />
+              </InputAdornment>
+            ),
+          }}
+        />
+      </div>
+
+      {/*  Spacefarers Table */}
       <SpacefarersTable
         spacefarers={paginatedSpacefarers}
         handleRowClick={handleRowClick}
         handlePromotion={handlePromotion}
       />
 
-      {/* ✅ Pagination Controls */}
+      {/*  Pagination Controls */}
       <div
         style={{
           display: 'flex',

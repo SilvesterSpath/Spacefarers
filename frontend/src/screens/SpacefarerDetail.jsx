@@ -1,3 +1,4 @@
+import { useContext } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -9,11 +10,13 @@ import {
   CircularProgress,
 } from '@mui/material';
 import config from '../../config';
+import { AuthContext } from '../context/AuthContext';
 
 const API_URL = config.apiUrl;
 
 export default function SpacefarerDetail() {
   const { id } = useParams();
+  const { token } = useContext(AuthContext);
 
   const {
     data: spacefarer,
@@ -22,9 +25,11 @@ export default function SpacefarerDetail() {
   } = useQuery({
     queryKey: ['spacefarer', id],
     queryFn: async () => {
-      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Unauthorized: No token available');
+      }
       const res = await axios.get(`${API_URL}/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }, //  Sends token in API request
+        headers: { Authorization: `Bearer ${token}` },
       });
       return res.data;
     },
