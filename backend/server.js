@@ -24,7 +24,7 @@ app.get('/spacefarers', async (req, res) => {
   }
 });
 
-// 🔐 Authenticated Route: Get a single spacefarer by ID
+//  Authenticated Route: Get a single spacefarer by ID
 app.get('/spacefarers/:id', authMiddleware, async (req, res) => {
   try {
     const spacefarer = await Spacefarer.findById(req.params.id);
@@ -35,7 +35,7 @@ app.get('/spacefarers/:id', authMiddleware, async (req, res) => {
   }
 });
 
-// 🔐 Authenticated Route: Create a new spacefarer
+//  Authenticated Route: Create a new spacefarer
 app.post('/spacefarers', authMiddleware, async (req, res) => {
   try {
     const spacefarer = new Spacefarer(req.body);
@@ -46,7 +46,7 @@ app.post('/spacefarers', authMiddleware, async (req, res) => {
   }
 });
 
-// 🔐 Authenticated Route: Promote a spacefarer
+//  Authenticated Route: Promote a spacefarer
 app.post('/spacefarers/:id/promote', authMiddleware, async (req, res) => {
   try {
     const spacefarer = await Spacefarer.findById(req.params.id);
@@ -65,7 +65,7 @@ app.post('/spacefarers/:id/promote', authMiddleware, async (req, res) => {
   }
 });
 
-// 🔐 Authenticated Route: Delete a spacefarer
+//  Authenticated Route: Delete a spacefarer
 app.delete('/spacefarers/:id', authMiddleware, async (req, res) => {
   try {
     await Spacefarer.findByIdAndDelete(req.params.id);
@@ -75,7 +75,7 @@ app.delete('/spacefarers/:id', authMiddleware, async (req, res) => {
   }
 });
 
-// 🔐 Authenticated Route: Create a new spacefarer
+//  Authenticated Route: Create a new spacefarer
 app.post('/spacefarers', authMiddleware, async (req, res) => {
   try {
     const spacefarer = new Spacefarer(req.body);
@@ -86,7 +86,7 @@ app.post('/spacefarers', authMiddleware, async (req, res) => {
   }
 });
 
-// 🔐 Generate Token (Login Simulation)
+//  Generate Token (Login Simulation)
 app.post('/spacefarers/login', (req, res) => {
   const { username } = req.body; // Assume login payload has username
 
