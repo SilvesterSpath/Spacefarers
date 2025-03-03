@@ -4,15 +4,8 @@ import axios from 'axios';
 import config from '../config';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from './context/AuthContext';
-import {
-  Container,
-  Button,
-  Typography,
-  TextField,
-  InputAdornment,
-} from '@mui/material';
-import PublicIcon from '@mui/icons-material/Public';
-import PaletteIcon from '@mui/icons-material/Palette';
+import { Container, Button, Typography } from '@mui/material';
+
 import LoginButton from './components/LoginButton';
 import LogoutButton from './components/LogoutButton';
 import SpacefarersTable from './components/SpacefarersTable';
@@ -21,12 +14,14 @@ import { usePromote } from './hooks/usePromote';
 import { toast } from 'react-hot-toast';
 import AddSpacefarerDialog from './components/AddSpacefarerDialog';
 import ThemeToggle from './components/ThemeToggle';
+import FilterControls from './components/FilterControls';
 
 const API_URL = config.apiUrl;
 
 export default function App() {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const { role, token } = useContext(AuthContext);
+  const [sortBy, setSortBy] = useState('');
   const navigate = useNavigate();
 
   const { data: spacefarers, isLoading } = useQuery({
@@ -74,14 +69,21 @@ export default function App() {
   if (isLoading) return <p>Loading spacefarers...</p>;
 
   //  Apply Filters Before Pagination
-  const filteredSpacefarers = spacefarers.filter((s) => {
-    return (
-      (searchOrigin === '' ||
-        s.originPlanet.toLowerCase().includes(searchOrigin.toLowerCase())) &&
-      (searchColor === '' ||
-        s.spacesuitColor.toLowerCase().includes(searchColor.toLowerCase()))
-    );
-  });
+  const filteredSpacefarers = spacefarers
+    .filter(
+      (s) =>
+        (searchOrigin === '' ||
+          s.originPlanet.toLowerCase().includes(searchOrigin.toLowerCase())) &&
+        (searchColor === '' ||
+          s.spacesuitColor.toLowerCase().includes(searchColor.toLowerCase()))
+    )
+    .sort((a, b) => {
+      if (!sortBy) return 0;
+      if (sortBy === 'name') return a.name.localeCompare(b.name);
+      if (sortBy === 'wormholeSkill') return b.wormholeSkill - a.wormholeSkill;
+      if (sortBy === 'stardustCollection')
+        return b.stardustCollection - a.stardustCollection;
+    });
 
   //  Paginate AFTER filtering
   const totalPages = Math.ceil(filteredSpacefarers.length / pageSize);
@@ -119,39 +121,14 @@ export default function App() {
       <AddSpacefarerDialog open={addDialogOpen} setOpen={setAddDialogOpen} />
 
       {/* Filter Controls */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-        {/* Origin Planet Filter */}
-        <TextField
-          label='Search Origin Planet'
-          variant='outlined'
-          value={searchOrigin}
-          onChange={(e) => setSearchOrigin(e.target.value)}
-          fullWidth
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position='start'>
-                <PublicIcon color='primary' />
-              </InputAdornment>
-            ),
-          }}
-        />
-
-        {/* Spacesuit Color Filter */}
-        <TextField
-          label='Search Spacesuit Color'
-          variant='outlined'
-          value={searchColor}
-          onChange={(e) => setSearchColor(e.target.value)}
-          fullWidth
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position='start'>
-                <PaletteIcon color='primary' />
-              </InputAdornment>
-            ),
-          }}
-        />
-      </div>
+      <FilterControls
+        searchOrigin={searchOrigin}
+        setSearchOrigin={setSearchOrigin}
+        searchColor={searchColor}
+        setSearchColor={setSearchColor}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+      />
 
       {/*  Spacefarers Table */}
       <SpacefarersTable
