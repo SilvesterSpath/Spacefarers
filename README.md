@@ -130,8 +130,8 @@ Click the **Login** button → Type `"admin"` to get **admin role**
 
 ## 📦 Deployment
 
-🔹 **Deploy Backend to** [Render](https://render.com/) / [Railway](https://railway.app/)  
-🔹 **Deploy Frontend to** [Vercel](https://vercel.com/) / [Netlify](https://www.netlify.com/)
+🔹 **Deploy Backend to** [Render](https://spacefarers.onrender.com)  
+🔹 **Deploy Frontend to** [Vercel](https://spacefarers.vercel.app)
 
 ---
 
