@@ -42,12 +42,15 @@ cd ../spacefarers-ui
 npm install
 3️⃣ Set Up Environment Variables
 Create a .env file inside the backend directory:
+create MonogDB Atlas database
+copy mongo_uri into .env (MONGO_URI=)
 
 🖥 Running the App
 Start the Backend
 
 cd backend
-npm start
+node api/seed.js
+node server.js
 Runs on: http://localhost:4004
 
 Start the Frontend
